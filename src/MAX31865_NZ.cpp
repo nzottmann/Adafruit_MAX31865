@@ -34,6 +34,7 @@ Adafruit_MAX31865::Adafruit_MAX31865(int8_t spi_cs, int8_t spi_mosi, int8_t spi_
   _miso = spi_miso;
   _mosi = spi_mosi;
 
+  _autoConvertEnabled = false;
 }
 
 // Hardware SPI init
@@ -111,6 +112,9 @@ void Adafruit_MAX31865::autoConvert(boolean b) {
     t &= ~MAX31856_CONFIG_MODEAUTO;       // disable autoconvert
   }
   writeRegister8(MAX31856_CONFIG_REG, t);
+
+  enableBias(b);
+  _autoConvertEnabled = b;
 }
 
 void Adafruit_MAX31865::setWires(max31865_numwires_t wires ) {
@@ -167,12 +171,14 @@ float  Adafruit_MAX31865::temperature(float RTDnominal, float refResistor) {
 
 uint16_t Adafruit_MAX31865::readRTD (void) {
   clearFault();
-  enableBias(true);
-  delay(10);
-  uint8_t t = readRegister8(MAX31856_CONFIG_REG);
-  t |= MAX31856_CONFIG_1SHOT;      
-  writeRegister8(MAX31856_CONFIG_REG, t);
-  delay(65);
+  if(!_autoConvertEnabled) {
+    enableBias(true);
+    delay(10);
+    uint8_t t = readRegister8(MAX31856_CONFIG_REG);
+    t |= MAX31856_CONFIG_1SHOT;      
+    writeRegister8(MAX31856_CONFIG_REG, t);
+    delay(65);
+  }
 
   uint16_t rtd = readRegister16(MAX31856_RTDMSB_REG);
 
