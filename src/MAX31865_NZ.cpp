@@ -14,7 +14,7 @@
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 
-#include "Adafruit_MAX31865.h"
+#include "MAX31865_NZ.h"
 #ifdef __AVR
   #include <avr/pgmspace.h>
 #elif defined(ESP8266)
